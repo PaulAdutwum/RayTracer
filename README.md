@@ -1,25 +1,29 @@
 # RayTracer Visualizer (C++20)
 
-Interactive, multithreaded ray tracer with BVH acceleration, PBR-style shading, and an ImGui control panel.
+An interactive, multithreaded ray tracer for macOS with BVH acceleration, PBR-style shading, and a real-time ImGui control panel.
 
-## Features
-- Ray–sphere and ray–triangle intersection
-- BVH acceleration with AABBs
-- PBR-style shading (roughness/metallic + Fresnel)
-- Soft shadows via area light sampling
-- Real-time UI controls (rlImGui)
-- Multithreaded CPU rendering
+## Highlights
+- Ray–sphere and ray–triangle intersections (Möller–Trumbore)
+- BVH acceleration with axis-aligned bounding boxes (AABB)
+- PBR-style shading (roughness/metallic + Schlick Fresnel)
+- Soft shadows using area-light sampling
+- Real-time UI controls via rlImGui
+- Multithreaded CPU rendering for responsive iteration
+
+## Tech Stack
+- C++20, CMake
+- Raylib (windowing + texture display)
+- Dear ImGui (docking branch) + rlImGui
 
 ## Dependencies (macOS)
-- CMake
-- Raylib (Homebrew)
-- ImGui (docking branch, fetched automatically unless vendored)
-- rlImGui (local clone in `external/rlImGui`)
-
-Install Raylib:
+Install Raylib and CMake with Homebrew:
 ```
 brew install cmake raylib
 ```
+
+ImGui is fetched automatically (docking branch) unless you vendor it in `external/imgui`.
+
+rlImGui is expected at `external/rlImGui` or fetched by CMake.
 
 ## Build & Run
 ```
@@ -28,6 +32,16 @@ cmake --build build
 ./build/raytracer
 ```
 
+## Controls
+- Orbit: right mouse button drag
+- Zoom: mouse wheel
+- UI panel: tweak light, material, and debug view
+
+## Project Structure
+- `src/main.cpp` — app loop + UI
+- `include/` — math, ray objects, BVH, renderer
+- `external/` — rlImGui (and optional ImGui)
+
 ## Notes
-- If you vendored ImGui, it must be the **docking** branch.
-- `external/rlImGui` is expected to exist locally or be fetched by CMake.
+- If you vendor ImGui, it must be the **docking** branch.
+- Use a lower shadow sample count if performance dips.
