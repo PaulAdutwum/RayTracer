@@ -12,6 +12,7 @@
 #include "Camera.h"
 #include "Sphere.h"
 #include "Triangle.h"
+#include "Hittable.h"
 #include "Vec3.h"
 
 struct RenderParams
@@ -117,6 +118,7 @@ inline void RenderScene(std::vector<Color> &pixels,
                         int height,
                         const OrbitCamera &camera,
                         const RenderParams &params,
+                        const std::vector<HittablePtr> &extra_objects,
                         unsigned int thread_count)
 {
     if (width <= 0 || height <= 0)
@@ -131,13 +133,17 @@ inline void RenderScene(std::vector<Color> &pixels,
     int rows_per_thread = std::max(1, height / static_cast<int>(thread_count));
 
     std::vector<HittablePtr> objects;
-    objects.reserve(2);
+    objects.reserve(2 + extra_objects.size());
     objects.push_back(std::make_shared<Sphere>(params.sphere));
     Triangle tri;
     tri.v0 = Vec3{-2.0f, -1.0f, -2.0f};
     tri.v1 = Vec3{2.0f, -1.0f, -2.0f};
     tri.v2 = Vec3{0.0f, 1.5f, -3.0f};
     objects.push_back(std::make_shared<Triangle>(tri));
+    for (const auto &obj : extra_objects)
+    {
+        objects.push_back(obj);
+    }
 
     HittablePtr bvh_root = BuildBVH(objects, 0, objects.size());
 

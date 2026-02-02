@@ -8,6 +8,7 @@
 #include <vector>
 
 #include "Camera.h"
+#include "MeshLoader.h"
 #include "Renderer.h"
 #include "Sphere.h"
 #include "Vec3.h"
@@ -49,6 +50,11 @@ int main()
     params.metallic = 0.05f;
     params.debug_normals = false;
 
+    std::vector<HittablePtr> model_objects;
+    Vec3 model_offset{0.0f, -1.0f, 0.0f};
+    float model_scale = 1.0f;
+    char model_path[256] = "assets/model.obj";
+
     unsigned int thread_count = std::max(1u, std::thread::hardware_concurrency());
 
     while (!WindowShouldClose())
@@ -82,7 +88,7 @@ int main()
             pixels.resize(static_cast<size_t>(screen_width * screen_height));
         }
 
-        RenderScene(pixels, screen_width, screen_height, camera, params, thread_count);
+        RenderScene(pixels, screen_width, screen_height, camera, params, model_objects, thread_count);
         UpdateTexture(cpu_texture, pixels.data());
 
         BeginTextureMode(render_target);
@@ -116,6 +122,21 @@ int main()
         ImGui::ColorEdit3("Albedo", &params.albedo.x);
         ImGui::SliderFloat("Roughness", &params.roughness, 0.0f, 1.0f);
         ImGui::SliderFloat("Metallic", &params.metallic, 0.0f, 1.0f);
+        ImGui::Separator();
+        ImGui::Text("OBJ Import");
+        ImGui::InputText("OBJ Path", model_path, sizeof(model_path));
+        ImGui::SliderFloat3("Model Offset", &model_offset.x, -5.0f, 5.0f);
+        ImGui::SliderFloat("Model Scale", &model_scale, 0.1f, 5.0f);
+        if (ImGui::Button("Load OBJ"))
+        {
+            model_objects.clear();
+            LoadObjAsTriangles(model_path, model_offset, model_scale, model_objects);
+        }
+        ImGui::SameLine();
+        if (ImGui::Button("Clear Model"))
+        {
+            model_objects.clear();
+        }
         ImGui::Separator();
         ImGui::Checkbox("Debug Normals", &params.debug_normals);
         ImGui::Text("Orbit: RMB drag, Zoom: mouse wheel");
